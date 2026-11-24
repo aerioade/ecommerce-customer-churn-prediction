@@ -7,7 +7,7 @@
 ## Ringkasan Proyek
 
 * **Jenis Tugas Data Mining:** Klasifikasi Biner (*Binary Classification* — `Churn` = `1` vs `Non-Churn` = `0`)
-* **Dataset:** `data/raw/data_ecommerce_customer_churn.csv` ($3.941$ baris mentah $\times$ $11$ kolom: $10$ fitur prediktor + $1$ target `Churn`; $3.270$ baris unik setelah pembersihan $671$ duplikat)
+* **Dataset:** `data/raw/data_ecommerce_customer_churn.csv` ($3.941$ baris mentah $\times$ $11$ kolom: $10$ fitur prediktor + $1$ target `Churn`; $3.269$ baris unik setelah standarisasi kategori dan deduplikasi)
 * **3 Algoritma Pembanding:**
   1. **Logistic Regression** (*Linear Baseline*)
   2. **Random Forest** (*Ensemble Bagging*)
@@ -22,7 +22,7 @@
 1. **Skema Kolom Aktual (11 Kolom):** Menggunakan tepat 10 fitur prediktor (`Tenure`, `WarehouseToHome`, `NumberOfDeviceRegistered`, `PreferedOrderCat`, `SatisfactionScore`, `MaritalStatus`, `NumberOfAddress`, `Complain`, `DaySinceLastOrder`, `CashbackAmount`) dan 1 target (`Churn`).
 2. **Protokol Anti-*Data Leakage*:**
    * Standarisasi kategori deterministik pada `PreferedOrderCat` (`'Mobile'` $\rightarrow$ `'Mobile Phone'`).
-   * Penghapusan $671$ baris duplikat (`drop_duplicates()`) **sebelum** pemisahan data agar sampel identik tidak bocor ke *train* dan *test*.
+   * Penghapusan $672$ baris duplikat setelah standarisasi kategori (`drop_duplicates()`) **sebelum** pemisahan data agar sampel identik tidak bocor ke *train* dan *test*.
    * *Stratified Train-Test Split* ($80:20$, `random_state=42`) dilakukan **sebelum** proses *fitting* `SimpleImputer`, `OneHotEncoder`, dan `StandardScaler` melalui `scikit-learn` `Pipeline` & `ColumnTransformer`.
 3. **Tanpa SMOTE & Tanpa PCA:**
    * Penanganan *class imbalance* menggunakan pembobotan kelas internal (`class_weight='balanced'` untuk Logistic Regression & Random Forest; `scale_pos_weight` untuk XGBoost) agar distribusi data tetap alami.
@@ -80,7 +80,7 @@ ecommerce-customer-churn-prediction/
 1. **Modul 1 — Prediksi Individual & Penjelasan SHAP Lokal:** Form interaktif 10 fitur, probabilitas *churn* (%), *Risk Tier Badge*, rekomendasi retensi otomatis, *SHAP Waterfall Plot*, serta Top 3 faktor pendorong & penahan risiko.
 2. **Modul 2 — *Batch Prediction* (Unggah CSV / Excel):** Unduh template CSV 10 kolom, proses prediksi massal, grafik distribusi *Risk Tier*, tabel hasil, dan unduh hasil prediksi (CSV).
 3. **Modul 3 — Analitik & Komparasi 3 Model:** Tabel perbandingan metrik, *Grouped Bar Chart*, kurva ROC-AUC gabungan, *Confusion Matrix* per model, dan validasi ganda *Global SHAP* vs *Tree Gain/Gini Importance*.
-4. **Modul 4 — Eksplorasi Data (EDA) & Ringkasan Proyek:** Statistik pembersihan data ($3.941 \rightarrow 3.270$ baris unik), *churn rate* per kategori, tabel deteksi *outlier* IQR, ringkasan metodologi, dan referensi ilmiah.
+4. **Modul 4 — Eksplorasi Data (EDA) & Ringkasan Proyek:** Statistik pembersihan data ($3.941 \rightarrow 3.269$ baris unik), *churn rate* per kategori, tabel deteksi *outlier* IQR, ringkasan metodologi, dan referensi ilmiah.
 
 ---
 
@@ -91,11 +91,30 @@ ecommerce-customer-churn-prediction/
 pip install -r requirements.txt
 ```
 
-### 2. Menjalankan EDA & Pelatihan Model
+### 2. Menjalankan EDA, Preprocessing, Pelatihan, dan SHAP
 ```bash
 python -m src.eda
+python -m src.preprocessing
 python -m src.train
+python -m src.explainability
 ```
+
+Training menelusuri seluruh grid Logistic Regression dan 12 kombinasi acak yang
+reproducible untuk masing-masing model pohon. Hasil evaluasi tersimpan di
+`artifacts/evaluation_metrics.json` dan pipeline terlatih di `models/`.
+Nilai `null` pertama pada daftar ambang ROC mewakili ambang tak hingga.
+
+Setelah training, modul SHAP menghasilkan `artifacts/feature_importance.json` dan
+`models/shap_background.joblib`. Jalankan ulang modul tersebut setelah melatih ulang
+model. Fungsi `load_explainer().explain_local(observation)` menerima DataFrame satu
+baris dan mengembalikan penjelasan untuk waterfall, faktor pendorong, faktor penahan,
+serta skala output. Untuk Logistic Regression, SHAP memakai penjelas linear dan
+perbandingan Gain/Gini tidak tersedia.
+
+Modul `src.risk_engine` menyediakan `classify_risk(probability)` untuk satu
+pelanggan dan `apply_risk_to_batch(customers, probabilities)` untuk satu
+probabilitas kelas churn per baris. Kolom `Predicted_Churn` menggunakan ambang
+0,50. Kolom `Risk_Tier` menggunakan ambang bisnis 0,35 dan 0,65.
 
 ### 3. Menjalankan *Web Dashboard* Streamlit
 ```bash
