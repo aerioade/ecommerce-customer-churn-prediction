@@ -191,6 +191,11 @@ button { color: inherit; }
   .sidebar-open + .sidebar-scrim { display: block; }
 }
 
+@media (max-width: 1120px) and (min-width: 821px) {
+  .sidebar .brand-name,
+  .sidebar .brand-subtitle { display: none; }
+}
+
 .cleaning-flow { display: grid; grid-template-columns: minmax(135px, .85fr) minmax(110px, .6fr) minmax(135px, .85fr) minmax(180px, 1.25fr); align-items: center; gap: 15px; padding: 17px 18px; border: 1px solid #263248; border-radius: 8px; background: #111827; }
 .cleaning-stage { display: flex; flex-direction: column; gap: 4px; }.cleaning-stage>.eyebrow { color: #828fa2; font-size: 8px; }.cleaning-stage>strong { color: #eff3f8; font: 600 26px 'Plus Jakarta Sans', sans-serif; letter-spacing: -.8px; font-variant-numeric: tabular-nums; }.cleaning-stage>span:nth-of-type(2) { color: #a0adbf; font-size: 9px; }.cleaning-stage>small { color: #68778d; font-size: 8px; }
 .cleaning-step { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #8a95a7; font-size: 8px; white-space: nowrap; }.cleaning-connector { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; color: #9c9fe0; }.cleaning-connector span { flex: 1; height: 1px; background: #3c4660; }.cleaning-step>strong { color: #c6c9eb; font-size: 12px; font-variant-numeric: tabular-nums; }.cleaning-stage-final>small { display: flex; align-items: center; gap: 4px; color: #59c9b0; }
