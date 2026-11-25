@@ -55,6 +55,7 @@ button { color: inherit; }
 .app-shell { min-height: 100vh; }
 .sidebar { width: 246px; position: fixed; inset: 0 auto 0 0; background: #070b14; border-right: 1px solid #1c2638; display: flex; flex-direction: column; padding: 27px 17px 18px; z-index: 20; }
 .brand { height: 47px; display: flex; align-items: center; gap: 11px; padding: 0 7px; }
+.brand > div { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
 .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; color: #a9abf3; border: 1px solid #3a3c6c; border-radius: 10px; background: #15182a; }
 .brand-name { font: 700 16px 'Plus Jakarta Sans', sans-serif; letter-spacing: -.55px; }
 .brand-subtitle { font-size: 8px; letter-spacing: 1.1px; color: #66738a; margin-top: 3px; }
@@ -145,7 +146,7 @@ button { color: inherit; }
 .importance-rank { color: #66748a; font-size: 8px; }.importance-row>strong { overflow: hidden; color: #d7deea; font-size: 9px; font-weight: 500; text-overflow: ellipsis; }.importance-track { height: 5px; background: #263146; border-radius: 4px; overflow: hidden; }.importance-track span { display: block; height: 100%; border-radius: inherit; opacity: .85; }.importance-row>b { color: #aab5c5; font-size: 9px; text-align: right; font-variant-numeric: tabular-nums; }
 .importance-foot { margin-top: 14px; padding-top: 9px; border-top: 1px solid #263248; color: #758298; font-size: 8px; }.importance-foot span { padding: 0 4px; color: #4d5a70; }
 .methodology-strip { display: grid; grid-template-columns: minmax(185px, .7fr) minmax(0, 2.3fr); gap: 20px; margin-top: 14px; padding: 17px 18px; border: 1px solid #263248; border-radius: 8px; background: #101725; }
-.methodology-heading h2 { margin: 5px 0; font: 600 14px 'Plus Jakarta Sans', sans-serif; }.methodology-heading p { max-width: 220px; margin: 0; color: #8390a3; font-size: 9px; line-height: 1.5; }.methodology-items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px 16px; }.methodology-items>div { display: grid; grid-template-columns: 20px 1fr; align-items: start; gap: 3px 8px; }.methodology-index { grid-row: span 2; color: #8589cf; font-size: 8px; padding-top: 1px; }.methodology-items strong { color: #dce3ed; font-size: 9px; font-weight: 500; }.methodology-items>div>span:last-child { color: #7c899c; font-size: 8px; line-height: 1.4; }
+.methodology-heading h2 { margin: 5px 0; font: 600 14px 'Plus Jakarta Sans', sans-serif; }.methodology-heading p { max-width: 220px; margin: 0; color: #8390a3; font-size: 9px; line-height: 1.5; }.methodology-items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; min-width: 0; }.methodology-items>div { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }.methodology-index { color: #8589cf; font-size: 8px; padding-top: 1px; }.methodology-items strong { display: block; max-width: 100%; color: #dce3ed; font-size: 10px; font-weight: 500; line-height: 1.35; }.methodology-items>div>span:last-child { display: block; max-width: 100%; color: #7c899c; font-size: 9px; line-height: 1.45; }
 .page-footer>span:last-child svg { vertical-align: -2px; margin-right: 5px; }
 
 /* Keep the navigation in the layout flow so it never covers dashboard content. */
