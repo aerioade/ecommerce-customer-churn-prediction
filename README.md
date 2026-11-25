@@ -127,6 +127,14 @@ Dashboard antarmuka berada di `app/` dan `components/`. Antarmuka ini menggunaka
 pipeline model, risk stratification, SHAP, serta artefak EDA yang sudah ada di
 repository melalui API lokal FastAPI di `backend/main.py`.
 
+Siapkan virtual environment dan dependency Python sekali saja:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
 Jalankan API Python pada terminal pertama:
 
 ```bash
