@@ -14,10 +14,12 @@ from pydantic import BaseModel
 
 from src.config import (
     BEST_MODEL_PATH,
+    CATEGORICAL_FEATURES,
     EDA_SUMMARY_PATH,
     EVALUATION_METRICS_PATH,
     FEATURE_COLUMNS,
     FEATURE_IMPORTANCE_PATH,
+    NUMERIC_FEATURES,
     RAW_DATA_PATH,
 )
 from src.data_loader import load_dataset, standardize_categories, validate_schema
@@ -70,6 +72,46 @@ def _local_explanation(frame: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+def _validate_inference_frame(frame: pd.DataFrame) -> list[str]:
+    """Validate batch inference inputs without changing the training pipeline."""
+    validate_schema(frame, require_target=False)
+    warnings: list[str] = []
+    ignored = [column for column in frame.columns if column not in FEATURE_COLUMNS]
+    if ignored:
+        warnings.append(f"Kolom tambahan diabaikan: {', '.join(ignored)}.")
+
+    allowed_categories = {
+        "PreferedOrderCat": {"Mobile Phone", "Fashion", "Grocery", "Laptop & Accessory", "Others"},
+        "MaritalStatus": {"Single", "Married", "Divorced"},
+    }
+    numeric_values: dict[str, pd.Series] = {}
+    for column in NUMERIC_FEATURES:
+        values = pd.to_numeric(frame[column], errors="coerce")
+        numeric_values[column] = values
+        if values[frame[column].notna()].isna().any():
+            raise ValueError(f"Kolom {column} harus berisi angka atau dikosongkan jika termasuk fitur yang boleh missing.")
+        missing = int(values.isna().sum())
+        if column not in {"Tenure", "WarehouseToHome", "DaySinceLastOrder"} and missing:
+            raise ValueError(f"Kolom {column} memiliki {missing} nilai kosong. Isi semua nilai ini sebelum upload.")
+        if (values.dropna() < 0).any():
+            raise ValueError(f"Kolom {column} tidak boleh berisi angka negatif.")
+    if not numeric_values["NumberOfDeviceRegistered"].dropna().between(1, 6).all():
+        raise ValueError("NumberOfDeviceRegistered harus berada pada rentang 1 sampai 6.")
+    if not numeric_values["SatisfactionScore"].dropna().between(1, 5).all():
+        raise ValueError("SatisfactionScore harus berada pada rentang 1 sampai 5.")
+    if not numeric_values["NumberOfAddress"].dropna().ge(1).all():
+        raise ValueError("NumberOfAddress harus bernilai minimal 1.")
+    if not numeric_values["Complain"].dropna().isin([0, 1]).all():
+        raise ValueError("Complain hanya boleh bernilai 0 atau 1.")
+    for column, allowed in allowed_categories.items():
+        if frame[column].isna().any():
+            raise ValueError(f"Kolom {column} tidak boleh kosong.")
+        invalid = sorted(set(frame[column].dropna().astype(str)) - allowed)
+        if invalid:
+            raise ValueError(f"Nilai {column} tidak dikenali: {', '.join(invalid)}.")
+    return warnings
+
+
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "model": "XGBoost"}
@@ -116,7 +158,7 @@ def dashboard_summary() -> dict[str, Any]:
 def predict_individual(customer: CustomerFeatures) -> dict[str, Any]:
     frame = standardize_categories(pd.DataFrame([customer.model_dump()]))
     try:
-        validate_schema(frame, require_target=False)
+        _validate_inference_frame(frame)
         probability = float(_positive_probabilities(frame)[0])
         return {
             "probability": probability,
@@ -143,7 +185,7 @@ def _read_upload(upload: UploadFile, content: bytes) -> pd.DataFrame:
 async def predict_batch(file: UploadFile = File(...)) -> dict[str, Any]:
     try:
         frame = _read_upload(file, await file.read())
-        validate_schema(frame, require_target=False)
+        warnings = _validate_inference_frame(standardize_categories(frame))
         customers = standardize_categories(frame)[FEATURE_COLUMNS].copy()
         probabilities = _positive_probabilities(customers)
         results = apply_risk_to_batch(customers, probabilities)
@@ -158,6 +200,7 @@ async def predict_batch(file: UploadFile = File(...)) -> dict[str, Any]:
             },
             "columns": list(results.columns),
             "rows": results.to_dict(orient="records"),
+            "warnings": warnings,
         }
     except Exception as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

@@ -159,6 +159,11 @@ Empat halaman dashboard membaca sumber asli repository:
 * **Model Analytics & EDA:** data dari `artifacts/evaluation_metrics.json`,
   `artifacts/feature_importance.json`, dan `artifacts/eda_summary.json`.
 
+Contoh file input batch untuk mencoba halaman Batch Prediction tersedia di
+`data/samples/churnguard_sample_customers.csv`. File ini hanya untuk inference
+dan demonstrasi; tidak digunakan untuk melatih ulang model atau mengubah dataset
+utama proyek.
+
 ---
 
 ## Referensi Ilmiah Acuan (Scopus 2026)
