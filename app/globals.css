@@ -231,5 +231,11 @@ button { color: inherit; }
 .data-guide-content > div { min-width: 0; padding-top: 12px; }
 .data-guide-content strong { display: block; color: #dce3ed; font-size: 9px; }
 .data-guide-content p { margin: 5px 0 0; color: #8290a4; font-size: 9px; line-height: 1.5; }
+.data-guide-content ul { display: grid; gap: 7px; margin: 7px 0 0; padding: 0; list-style: none; color: #9aa8bb; font-size: 9px; line-height: 1.35; }
+.data-guide-content li { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.data-guide-content li::before { content: ""; width: 4px; height: 4px; flex: 0 0 4px; border-radius: 50%; background: #7f82d9; }
+.data-guide-content code { color: #dce3ed; font-family: inherit; font-size: inherit; }
+.data-guide-content li span:not(.guide-badge) { color: #8290a4; }
+.guide-badge { display: inline-flex; padding: 2px 5px; border: 1px solid #344363; border-radius: 4px; color: #c6c9ff; font-size: 8px; white-space: nowrap; }
 .batch-warning { margin: 8px 0 0; color: #fbbf24; font-size: 9px; line-height: 1.4; }
 @media (max-width: 820px) { .data-guide-content { grid-template-columns: 1fr; gap: 0; } }
