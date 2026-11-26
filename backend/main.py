@@ -53,6 +53,11 @@ def _load_json(path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _records_json_safe(frame: pd.DataFrame) -> list[dict[str, Any]]:
+    """Convert DataFrame rows to JSON-compliant dicts with NaN/NA replaced by None."""
+    return frame.astype(object).where(pd.notna(frame), None).to_dict(orient="records")
+
+
 def _pipeline():
     return joblib.load(BEST_MODEL_PATH)
 
@@ -150,7 +155,7 @@ def dashboard_summary() -> dict[str, Any]:
             "low_risk": int(counts.get("Low Risk", 0)),
             "average_probability": float(results["Churn_Probability"].mean()),
         },
-        "priority_customers": priority.to_dict(orient="records"),
+        "priority_customers": _records_json_safe(priority),
     }
 
 
@@ -199,7 +204,7 @@ async def predict_batch(file: UploadFile = File(...)) -> dict[str, Any]:
                 "average_probability": float(results["Churn_Probability"].mean()),
             },
             "columns": list(results.columns),
-            "rows": results.to_dict(orient="records"),
+            "rows": _records_json_safe(results),
             "warnings": warnings,
         }
     except Exception as exc:
