@@ -5,134 +5,134 @@
   "shap_importance": [
     {
       "feature": "Tenure",
-      "importance": 2.2742161750793457
+      "importance": 2.2886857986450195
     },
     {
       "feature": "CashbackAmount",
-      "importance": 0.8839241862297058
+      "importance": 0.8907155990600586
     },
     {
       "feature": "Complain",
-      "importance": 0.8492134809494019
+      "importance": 0.8567607402801514
     },
     {
       "feature": "NumberOfAddress",
-      "importance": 0.6636921763420105
+      "importance": 0.6574786901473999
     },
     {
       "feature": "WarehouseToHome",
-      "importance": 0.5148300528526306
+      "importance": 0.5169069170951843
     },
     {
       "feature": "DaySinceLastOrder",
-      "importance": 0.4756785035133362
+      "importance": 0.46941933035850525
     },
     {
       "feature": "SatisfactionScore",
-      "importance": 0.38543930649757385
+      "importance": 0.37402844429016113
     },
     {
       "feature": "MaritalStatus_Single",
-      "importance": 0.32690396904945374
-    },
-    {
-      "feature": "PreferedOrderCat_Laptop & Accessory",
-      "importance": 0.2715180516242981
+      "importance": 0.31015220284461975
     },
     {
       "feature": "NumberOfDeviceRegistered",
-      "importance": 0.26400893926620483
+      "importance": 0.27768316864967346
+    },
+    {
+      "feature": "PreferedOrderCat_Laptop & Accessory",
+      "importance": 0.25254467129707336
     },
     {
       "feature": "MaritalStatus_Married",
-      "importance": 0.15967437624931335
+      "importance": 0.1503441482782364
     },
     {
       "feature": "PreferedOrderCat_Fashion",
-      "importance": 0.07929375767707825
-    },
-    {
-      "feature": "MaritalStatus_Divorced",
-      "importance": 0.039866745471954346
+      "importance": 0.08046211302280426
     },
     {
       "feature": "PreferedOrderCat_Mobile Phone",
-      "importance": 0.037767939269542694
+      "importance": 0.05511701479554176
+    },
+    {
+      "feature": "MaritalStatus_Divorced",
+      "importance": 0.04023411497473717
     },
     {
       "feature": "PreferedOrderCat_Others",
-      "importance": 0.03242480009794235
+      "importance": 0.039308466017246246
     },
     {
       "feature": "PreferedOrderCat_Grocery",
-      "importance": 0.007121080998331308
+      "importance": 0.006579169537872076
     }
   ],
   "model_importance_method": "gain",
   "model_importance": [
     {
       "feature": "Tenure",
-      "importance": 0.1768779158592224
+      "importance": 0.17791242897510529
     },
     {
       "feature": "Complain",
-      "importance": 0.10909043997526169
-    },
-    {
-      "feature": "PreferedOrderCat_Grocery",
-      "importance": 0.06556221842765808
-    },
-    {
-      "feature": "PreferedOrderCat_Others",
-      "importance": 0.06533239781856537
+      "importance": 0.11231289803981781
     },
     {
       "feature": "PreferedOrderCat_Fashion",
-      "importance": 0.06498800218105316
+      "importance": 0.07445801794528961
     },
     {
       "feature": "PreferedOrderCat_Laptop & Accessory",
-      "importance": 0.06302092224359512
+      "importance": 0.06883751600980759
     },
     {
-      "feature": "PreferedOrderCat_Mobile Phone",
-      "importance": 0.05924810841679573
+      "feature": "PreferedOrderCat_Others",
+      "importance": 0.06365228444337845
     },
     {
-      "feature": "SatisfactionScore",
-      "importance": 0.05162094160914421
-    },
-    {
-      "feature": "NumberOfAddress",
-      "importance": 0.05147119611501694
-    },
-    {
-      "feature": "CashbackAmount",
-      "importance": 0.05098336935043335
-    },
-    {
-      "feature": "DaySinceLastOrder",
-      "importance": 0.050702549517154694
+      "feature": "PreferedOrderCat_Grocery",
+      "importance": 0.05722678452730179
     },
     {
       "feature": "MaritalStatus_Single",
-      "importance": 0.048803772777318954
+      "importance": 0.05499707907438278
+    },
+    {
+      "feature": "NumberOfAddress",
+      "importance": 0.05476601794362068
+    },
+    {
+      "feature": "SatisfactionScore",
+      "importance": 0.053442489355802536
+    },
+    {
+      "feature": "CashbackAmount",
+      "importance": 0.05172434821724892
+    },
+    {
+      "feature": "DaySinceLastOrder",
+      "importance": 0.051061153411865234
+    },
+    {
+      "feature": "PreferedOrderCat_Mobile Phone",
+      "importance": 0.04194305092096329
     },
     {
       "feature": "WarehouseToHome",
-      "importance": 0.03972827270627022
+      "importance": 0.03940405324101448
     },
     {
       "feature": "NumberOfDeviceRegistered",
-      "importance": 0.03756913170218468
+      "importance": 0.037136659026145935
     },
     {
       "feature": "MaritalStatus_Married",
-      "importance": 0.03487777337431908
+      "importance": 0.03110019862651825
     },
     {
       "feature": "MaritalStatus_Divorced",
-      "importance": 0.030122989788651466
+      "importance": 0.030025027692317963
     }
   ]
 }
