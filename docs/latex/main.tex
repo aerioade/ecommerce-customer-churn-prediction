@@ -7,6 +7,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[indonesian]{babel}
 \usepackage{mathptmx} % Times New Roman untuk teks & matematika
+\usepackage[scaled=0.85]{couriers} % Courier ringkas agar teks kode di tabel & paragraf tidak meluber
 \usepackage[top=3cm,bottom=3cm,left=4cm,right=3cm]{geometry}
 \usepackage{setspace}
 \usepackage{amsmath,amssymb}
@@ -22,6 +23,7 @@
 \usepackage{enumitem}
 \usepackage{tcolorbox}
 \usepackage{microtype}
+\usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
 
 % ============================================================
@@ -31,6 +33,7 @@
 \onehalfspacing
 \setlength{\parindent}{1cm}
 \setlength{\parskip}{4pt}
+\emergencystretch=2em
 
 \definecolor{HeaderBlue}{HTML}{4F81BD}
 \definecolor{LightRow}{HTML}{F2F5F9}
@@ -38,10 +41,12 @@
 \definecolor{CodeColor}{HTML}{1E3A5F}
 \definecolor{MutedGray}{HTML}{555555}
 
-% Helper penulisan kode inline yang rapi (robust untuk caption & daftar tabel/gambar)
-\DeclareRobustCommand{\code}[1]{\texttt{\small\textcolor{CodeColor}{#1}}}
+% Helper penulisan kode inline yang rapi (mewarisi ukuran font sekitar secara aman)
+\DeclareRobustCommand{\code}[1]{\texttt{\textcolor{CodeColor}{#1}}}
 
-% Kolom tabel fleksibel (tabularx)
+% Kolom tabel terstruktur tanpa rata kiri-kanan berlebihan
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \newcolumntype{C}{>{\centering\arraybackslash}X}
 \newcommand{\thdr}[1]{\textcolor{white}{\textbf{#1}}}
@@ -126,41 +131,44 @@
 % HALAMAN SAMPUL
 % ------------------------------------------------------------
 \begin{titlepage}
+  \singlespacing
   \centering
-  \vspace*{0.4cm}
+  \vspace*{0.1cm}
   {\fontsize{14}{18}\selectfont\bfseries
     LAPORAN TEAM-BASED PROJECT (TBP)\\
     MATA KULIAH DATA MINING\par}
 
-  \vspace{1.0cm}
-  {\fontsize{14}{20}\selectfont\bfseries
+  \vspace{0.6cm}
+  {\fontsize{14}{19}\selectfont\bfseries
     SISTEM PREDIKSI \textit{E-COMMERCE CUSTOMER CHURN}\\
     MENGGUNAKAN KOMPARASI ALGORITMA KLASIFIKASI\\
     BERBASIS \textit{EXPLAINABLE AI} (SHAP)\par}
 
-  \vspace{1.2cm}
-  \includegraphics[width=4.2cm]{logo_uns.png}
+  \vspace{0.8cm}
+  \includegraphics[width=3.6cm]{logo_uns.png}
 
-  \vspace{1.1cm}
+  \vspace{0.8cm}
   {\fontsize{12}{16}\selectfont
     \textbf{Dosen Pengampu:}\\
     DR. Wiranto M.KOM., M.CS.\par}
 
-  \vspace{0.9cm}
+  \vspace{0.6cm}
   {\fontsize{12}{16}\selectfont\textbf{Disusun Oleh --- Kelompok 6:}\par}
-  \vspace{0.35cm}
+  \vspace{0.2cm}
 
+  {\renewcommand{\arraystretch}{1.15}
   \begin{tabular}{@{}p{7.2cm}l@{}}
     1. Adrian Alviano Susatyo & L0124001 \\
     2. Danieal Ferdinan Napitupulu & L0124008 \\
     3. Radit Alfa Anugerah Bombing & L0124116 \\
     4. Valentino Joan Caesar & L0124121 \\
     5. Aerio Ade Putra & L0124128 \\
-  \end{tabular}
+  \end{tabular}}
 
-  \vspace{0.8cm}
-  {\fontsize{10.5}{14}\selectfont
-    \textbf{Repositori GitHub:} \url{https://github.com/aerioade/ecommerce-customer-churn-prediction}\par}
+  \vspace{0.5cm}
+  {\fontsize{10}{14}\selectfont
+    \textbf{Repositori GitHub:}\\
+    \url{https://github.com/aerioade/ecommerce-customer-churn-prediction}\par}
 
   \vfill
   {\fontsize{12}{16}\selectfont\bfseries
@@ -223,7 +231,7 @@ Tujuan dari pelaksanaan proyek ini adalah:
 
 Agar pelaksanaan proyek tetap terfokus, terukur, dan konsisten dengan kondisi data aktual, ditetapkan batasan-batasan sebagai berikut:
 \begin{enumerate}[leftmargin=0.8cm, itemsep=2pt]
-  \item \textbf{Skema Dataset Aktual:} Penelitian menggunakan dataset sekunder \code{data\_ecommerce\_customer\_churn.csv} yang terdiri atas \textbf{3.941 baris mentah} dan \textbf{11 kolom} (10 fitur prediktor perilaku/demografi dan 1 variabel target biner \code{Churn}), tanpa melibatkan atribut eksternal yang tidak tersedia dalam dataset (seperti \code{CustomerID}, \code{Gender}, atau log klik \textit{real-time}).
+  \item \textbf{Skema Dataset Aktual:} Penelitian menggunakan dataset sekunder \code{data\_\allowbreak ecommerce\_\allowbreak customer\_\allowbreak churn.csv} yang terdiri atas \textbf{3.941 baris mentah} dan \textbf{11 kolom} (10 fitur prediktor perilaku/demografi dan 1 variabel target biner \code{Churn}), tanpa melibatkan atribut eksternal yang tidak tersedia dalam dataset (seperti \code{CustomerID}, \code{Gender}, atau log klik \textit{real-time}).
   \item \textbf{Algoritma Pembanding:} Pemodelan difokuskan pada komparasi tiga paradigma klasifikasi yang saling melengkapi, yaitu Logistic Regression, Random Forest, dan XGBoost, dengan nilai benih acak tetap (\code{RANDOM\_STATE = 42}) untuk menjamin reproduksibilitas penuh.
   \item \textbf{Penanganan Imbalance, Outlier, dan Dimensi Fitur:} Ketidakseimbangan kelas ditangani menggunakan pembobotan kelas internal (\textit{cost-sensitive learning}: \code{class\_weight='balanced'} dan \code{scale\_pos\_weight}) \textbf{tanpa} SMOTE/resampling sintetis. Reduksi dimensi seperti PCA \textbf{tidak digunakan} demi menjaga keterbacaan nama fitur asli pada grafik SHAP. \textit{Outlier} yang terdeteksi dengan metode IQR didokumentasikan pada tahap EDA dan tidak dihapus agar variasi perilaku pelanggan nyata tetap terjaga.
   \item \textbf{Lingkup Deployment:} Implementasi produk akhir berupa \textit{prototype web dashboard} lokal berbasis Streamlit yang menggunakan artefak model terlatih (\code{.joblib}) dan ringkasan evaluasi terstruktur (\code{.json}), tanpa integrasi ke basis data produksi (\textit{live production database}) perusahaan tertentu.
@@ -238,18 +246,19 @@ Proyek ini memberikan manfaat baik secara akademis (penerapan metodologi \textit
   \caption{Target Luaran (\textit{Deliverables}) Wajib \textit{Team-Based Project}}
   \label{tab:deliverables}
   \renewcommand{\arraystretch}{1.28}
+  \setlength{\tabcolsep}{4pt}
   \footnotesize
-  \begin{tabularx}{\textwidth}{@{}c p{3.3cm} L p{3.0cm}@{}}
+  \begin{tabularx}{\textwidth}{@{}M{0.6cm} P{2.9cm} L P{3.5cm}@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{No} & \thdr{Luaran (\textit{Deliverable})} & \thdr{Spesifikasi Teknis \& Isi} & \thdr{Format / Lokasi} \\
     \midrule
-    1 & \textbf{Dataset Bersih \& Terdokumentasi} & Dataset mentah (3.941 baris) serta partisi bersih hasil standarisasi kategori, deduplikasi, dan \textit{stratified split} 80:20 (\code{train\_data.csv} \& \code{test\_data.csv}), lengkap dengan kamus 11 atribut. & \code{.csv} (\code{data/raw/}, \code{data/processed/}) \\
+    1 & \textbf{Dataset Bersih \& Terdokumentasi} & Dataset mentah (3.941 baris) serta partisi bersih hasil standarisasi kategori, deduplikasi, dan \textit{stratified split} 80:20 (\code{train\_data.csv} \& \code{test\_data.csv}), lengkap dengan kamus 11 atribut. & \code{.csv}\newline(\code{data/raw/},\newline\code{data/processed/}) \\
     \rowcolor{LightRow}
-    2 & \textbf{Kode Program Modular \& Notebook} & \textit{Codebase} Python modular (\code{config.py}, \code{data\_loader.py}, \code{eda.py}, \code{preprocessing.py}, \code{train.py}, \code{explainability.py}, \code{risk\_engine.py}) serta notebook eksperimen \textit{end-to-end}. & \code{.py}, \code{.ipynb} (\code{src/}, \code{notebooks/}) \\
-    3 & \textbf{Artefak Model Terlatih \& Evaluasi} & File serialisasi \textit{pipeline} lengkap (\code{Preprocessor + Classifier}) untuk 3 algoritma, model terbaik, latar belakang SHAP, serta laporan metrik/EDA/SHAP terstruktur. & \code{.joblib}, \code{.json} (\code{models/}, \code{artifacts/}) \\
+    2 & \textbf{Kode Program Modular \& Notebook} & \textit{Codebase} Python modular (\code{config.py}, \code{data\_loader.py}, \code{eda.py}, \code{preprocessing.py}, \code{train.py}, \code{explainability.py}, \code{risk\_engine.py}) serta notebook eksperimen \textit{end-to-end}. & \code{.py}, \code{.ipynb}\newline(\code{src/}, \code{notebooks/}) \\
+    3 & \textbf{Artefak Model Terlatih \& Evaluasi} & File serialisasi \textit{pipeline} lengkap (\code{Preprocessor + Classifier}) untuk 3 algoritma, model terbaik, latar belakang SHAP, serta laporan metrik/EDA/SHAP terstruktur. & \code{.joblib}, \code{.json}\newline(\code{models/}, \code{artifacts/}) \\
     \rowcolor{LightRow}
-    4 & \textbf{\textit{Prototype / Web Dashboard} Interaktif} & Aplikasi web berbasis Streamlit dengan 4 modul utama: Prediksi Individual + SHAP Lokal, \textit{Batch Prediction} CSV/Excel, Analitik Komparasi 3 Model, dan Ringkasan EDA. & \textbf{Web App} (\code{app/streamlit\_app.py}) \\
+    4 & \textbf{\textit{Prototype / Web Dashboard} Interaktif} & Aplikasi web berbasis Streamlit dengan 4 modul utama: Prediksi Individual + SHAP Lokal, \textit{Batch Prediction} CSV/Excel, Analitik Komparasi 3 Model, dan Ringkasan EDA. & \textbf{Web App}\newline(\code{app/\allowbreak streamlit\_app.py}) \\
     5 & \textbf{Laporan Proyek Akademis} & Laporan tertulis sistematis Bab 1 s.d. Bab 5 yang memuat manajemen proses tim, landasan matematis, analisis hasil eksperimen, interpretasi SHAP, dan referensi ilmiah. & \code{.tex} / \code{.docx} / \code{.pdf} \\
     \rowcolor{LightRow}
     6 & \textbf{Slide Presentasi \& Skenario \textit{Live Demo}} & Materi presentasi tim yang ringkas disertai skenario demonstrasi langsung penggunaan \textit{web dashboard} (simulasi pelanggan High/Low Risk dan unggah \textit{batch} CSV). & \code{.pptx} / \code{.pdf} \\
@@ -271,8 +280,9 @@ Kajian terhadap literatur ilmiah terkini pada periode 2024--2026 menunjukkan tre
   \caption{Matriks Perbandingan Penelitian Terdahulu (\textit{State of the Art})}
   \label{tab:sota}
   \renewcommand{\arraystretch}{1.28}
+  \setlength{\tabcolsep}{3.5pt}
   \scriptsize
-  \begin{tabularx}{\textwidth}{@{}c p{2.3cm} p{2.0cm} L L L@{}}
+  \begin{tabularx}{\textwidth}{@{}M{0.5cm} P{2.2cm} P{1.9cm} L L L@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{No} & \thdr{Peneliti \& Publikasi} & \thdr{Domain \& Dataset} & \thdr{Metode \& Penanganan Imbalance} & \thdr{Hasil Utama \& Peran XAI} & \thdr{Keterbatasan / Celah (\textit{Gap})} \\
@@ -461,58 +471,60 @@ Sesuai prinsip \textit{Team-Based Project} yang menilai \textbf{kualitas proses 
   \caption{Matriks Pembagian Peran dan Tanggung Jawab Anggota Tim}
   \label{tab:peran_tim}
   \renewcommand{\arraystretch}{1.28}
+  \setlength{\tabcolsep}{4pt}
   \footnotesize
-  \begin{tabularx}{\textwidth}{@{}c p{2.7cm} c L p{3.4cm}@{}}
+  \begin{tabularx}{\textwidth}{@{}M{0.5cm} P{2.3cm} M{1.5cm} L P{3.7cm}@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{No} & \thdr{Peran Tim} & \thdr{Anggota} & \thdr{Tanggung Jawab Utama} & \thdr{Output / Artefak} \\
     \midrule
-    1 & \textbf{Leader / System Architect} & Adrian & Perancangan arsitektur repositori, koordinasi integrasi antarmodul, \textit{code review} \& \textit{merge Pull Request} di GitHub. & \code{src/config.py}, \code{requirements.txt}, \code{docs/md/*}, manajemen branch GitHub \\
+    1 & \textbf{Leader / System Architect} & Adrian & Perancangan arsitektur repositori, koordinasi integrasi antarmodul, \textit{code review} \& \textit{merge Pull Request} di GitHub. & \code{src/config.py},\newline\code{requirements.txt},\newline\code{docs/md/*},\newline manajemen branch GitHub \\
     \rowcolor{LightRow}
-    2 & \textbf{Data Engineer \& Preprocessing} & Adrian & Pemuatan data, validasi skema 11 kolom, analisis EDA \& \textit{outlier} IQR, deduplikasi, \textit{stratified split}, dan \textit{pipeline preprocessing} anti-\textit{leakage}. & \code{data\_loader.py}, \code{eda.py}, \code{preprocessing.py}, \code{data/processed/*.csv}, \code{eda\_summary.json} \\
-    3 & \textbf{ML Modeler \& Evaluator} & Aerio & Pelatihan \& \textit{tuning} 3 model (5-Fold CV), kalkulasi 7 metrik evaluasi, integrasi SHAP (\code{TreeExplainer} \& \textit{Dual Validation}), dan mesin \textit{3-Tier Risk}. & \code{train.py}, \code{explainability.py}, \code{risk\_engine.py}, \code{models/*.joblib}, \code{artifacts/*.json} \\
+    2 & \textbf{Data Engineer \& Preprocessing} & Adrian & Pemuatan data, validasi skema 11 kolom, analisis EDA \& \textit{outlier} IQR, deduplikasi, \textit{stratified split}, dan \textit{pipeline preprocessing} anti-\textit{leakage}. & \code{data\_loader.py}, \code{eda.py},\newline\code{preprocessing.py},\newline\code{data/processed/*.csv},\newline\code{eda\_summary.json} \\
+    3 & \textbf{ML Modeler \& Evaluator} & Aerio & Pelatihan \& \textit{tuning} 3 model (5-Fold CV), kalkulasi 7 metrik evaluasi, integrasi SHAP (\code{TreeExplainer} \& \textit{Dual Validation}), dan mesin \textit{3-Tier Risk}. & \code{train.py}, \code{explainability.py},\newline\code{risk\_engine.py},\newline\code{models/*.joblib},\newline\code{artifacts/*.json} \\
     \rowcolor{LightRow}
-    4 & \textbf{Web Prototype Developer} & Valen & Pengembangan antarmuka web interaktif berbasis Streamlit (4 modul: Individual + SHAP, \textit{Batch} CSV/Excel, Komparasi 3 Model, EDA) serta uji UI/UX. & \code{app/streamlit\_app.py}, \code{notebooks/full\_experiment.ipynb} \\
-    5 & \textbf{Technical Writer \& Presentation} & Bombing, Daniel & Verifikasi referensi jurnal Scopus, penyusunan laporan akademis Bab 1--5, dokumentasi interpretasi bisnis SHAP, slide presentasi, \& skenario \textit{live demo}. & Laporan TBP (\code{.tex}/\code{.docx}/\code{.pdf}), Slide Presentasi (\code{.pptx}), \code{README.md}, koleksi referensi \\
+    4 & \textbf{Web Prototype Developer} & Valen & Pengembangan antarmuka web interaktif berbasis Streamlit (4 modul: Individual + SHAP, \textit{Batch} CSV/Excel, Komparasi 3 Model, EDA) serta uji UI/UX. & \code{app/streamlit\_app.py},\newline\code{notebooks/\allowbreak full\_\allowbreak experiment.ipynb} \\
+    5 & \textbf{Technical Writer \& Presentation} & Bombing, Daniel & Verifikasi referensi jurnal Scopus, penyusunan laporan akademis Bab 1--5, dokumentasi interpretasi bisnis SHAP, slide presentasi, \& skenario \textit{live demo}. & Laporan TBP (\code{.tex}/\code{.docx}/\code{.pdf}),\newline Slide Presentasi (\code{.pptx}),\newline\code{README.md}, koleksi referensi \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-Kolaborasi kode dikelola pada repositori GitHub (\code{aerioade/ecommerce-customer-churn-prediction}) menggunakan mekanisme \textit{feature branching} dan \textit{Pull Request} (contoh: branch \code{setup/configuration}, \code{task/data-processing}, dan \code{task/modeling-shap-risk} digabungkan ke \code{main} melalui PR \#1, PR \#2, dan PR \#3). Rencana pemecahan kerja 10 \textit{task} dirangkum pada Tabel~\ref{tab:wbs}.
+Kolaborasi kode dikelola pada repositori GitHub (\code{aerioade/\allowbreak ecommerce-\allowbreak customer-\allowbreak churn-\allowbreak prediction}) menggunakan mekanisme \textit{feature branching} dan \textit{Pull Request} (contoh: branch \code{setup/configuration}, \code{task/data-processing}, dan \code{task/modeling-shap-risk} digabungkan ke \code{main} melalui PR \#1, PR \#2, dan PR \#3). Rencana pemecahan kerja 10 \textit{task} dirangkum pada Tabel~\ref{tab:wbs}.
 
 \begin{table}[H]
   \centering
   \caption{Rencana Pemecahan Kerja (\textit{Work Breakdown Structure}) 10 Task Proyek}
   \label{tab:wbs}
   \renewcommand{\arraystretch}{1.28}
-  \footnotesize
-  \begin{tabularx}{\textwidth}{@{}c L c p{3.6cm} p{2.7cm}@{}}
+  \setlength{\tabcolsep}{4pt}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{@{}M{1.0cm} L M{1.5cm} P{3.8cm} M{2.4cm}@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Task} & \thdr{Fokus Pengerjaan} & \thdr{Dependensi} & \thdr{Target Artefak} & \thdr{Tahap Pengerjaan} \\
     \midrule
-    Task 1 & Setup Struktur Folder, Dependensi, \& Konfigurasi Global & --- & \code{requirements.txt}, \code{src/config.py} & Tahap 1 (Inisiasi \& Setup) \\
+    Task 1 & Setup Struktur Folder, Dependensi, \& Konfigurasi Global & --- & \code{requirements.txt},\newline\code{src/config.py} & Tahap 1 (Inisiasi \& Setup) \\
     \rowcolor{LightRow}
-    Task 2 & Data Loader \& EDA (Duplikat, \textit{Missing Values}, IQR) & Task 1 & \code{data\_loader.py}, \code{eda.py}, \code{eda\_summary.json} & Tahap 2 (EDA \& Preprocessing) \\
-    Task 3 & Preprocessing Pipeline Anti-\textit{Data Leakage} \& Split 80:20 & Task 2 & \code{preprocessing.py}, \code{train\_data.csv}, \code{test\_data.csv} & Tahap 2 (EDA \& Preprocessing) \\
+    Task 2 & Data Loader \& EDA (Duplikat, \textit{Missing Values}, IQR) & Task 1 & \code{data\_loader.py}, \code{eda.py},\newline\code{eda\_summary.json} & Tahap 2 (EDA \& Preprocessing) \\
+    Task 3 & Preprocessing Pipeline Anti-\textit{Data Leakage} \& Split 80:20 & Task 2 & \code{preprocessing.py},\newline\code{train\_data.csv}, \code{test\_data.csv} & Tahap 2 (EDA \& Preprocessing) \\
     \rowcolor{LightRow}
-    Task 4 & Pelatihan 3 Model, 5-Fold CV, \textit{Tuning}, \& Evaluasi & Task 3 & \code{train.py}, \code{models/*.joblib}, \code{evaluation\_metrics.json} & Tahap 3 (Modeling, SHAP, \& Risk) \\
-    Task 5 & \textit{Explainable AI} (SHAP Global/Lokal) \& \textit{Dual Validation} & Task 4 & \code{explainability.py}, \code{feature\_importance.json} & Tahap 3 (Modeling, SHAP, \& Risk) \\
+    Task 4 & Pelatihan 3 Model, 5-Fold CV, \textit{Tuning}, \& Evaluasi & Task 3 & \code{train.py}, \code{models/*.joblib},\newline\code{evaluation\_metrics.json} & Tahap 3 (Modeling, SHAP, \& Risk) \\
+    Task 5 & \textit{Explainable AI} (SHAP Global/Lokal) \& \textit{Dual Validation} & Task 4 & \code{explainability.py},\newline\code{feature\_importance.json} & Tahap 3 (Modeling, SHAP, \& Risk) \\
     \rowcolor{LightRow}
     Task 6 & Mesin \textit{3-Tier Risk Stratification} \& Aksi Retensi & Task 1 & \code{src/risk\_engine.py} & Tahap 3 (Modeling, SHAP, \& Risk) \\
-    Task 7 & Web Dashboard: Kerangka \& Modul 1 (Individual + SHAP) & Task 5 \& 6 & \code{app/streamlit\_app.py} (Modul 1) & Tahap 4 (Web Dashboard) \\
+    Task 7 & Web Dashboard: Kerangka \& Modul 1 (Individual + SHAP) & Task 5 \& 6 & \code{app/streamlit\_app.py}\newline(Modul 1) & Tahap 4 (Web Dashboard) \\
     \rowcolor{LightRow}
-    Task 8 & Web Dashboard: Modul 2 (\textit{Batch Prediction} CSV/Excel) & Task 7 & \code{app/streamlit\_app.py} (Modul 2) & Tahap 4 (Web Dashboard) \\
-    Task 9 & Web Dashboard: Modul 3 (Komparasi) \& Modul 4 (EDA) & Task 7 & \code{app/streamlit\_app.py} (Modul 3 \& 4) & Tahap 4 (Web Dashboard) \\
+    Task 8 & Web Dashboard: Modul 2 (\textit{Batch Prediction} CSV/Excel) & Task 7 & \code{app/streamlit\_app.py}\newline(Modul 2) & Tahap 4 (Web Dashboard) \\
+    Task 9 & Web Dashboard: Modul 3 (Komparasi) \& Modul 4 (EDA) & Task 7 & \code{app/streamlit\_app.py}\newline(Modul 3 \& 4) & Tahap 4 (Web Dashboard) \\
     \rowcolor{LightRow}
-    Task 10 & Notebook Eksperimen, Laporan Akhir, Presentasi, \& Uji Akhir & Task 1--9 & \code{full\_experiment.ipynb}, Laporan, \code{.pptx}, Demo & Tahap 5 (Finalisasi \& Dokumentasi) \\
+    Task 10 & Notebook Eksperimen, Laporan Akhir, Presentasi, \& Uji Akhir & Task 1--9 & \code{full\_experiment.ipynb},\newline Laporan, \code{.pptx}, Demo & Tahap 5 (Finalisasi \& Dokumentasi) \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \section{Pengumpulan dan Spesifikasi Dataset (Tahap 2: \textit{Data Collection})}
 
-Dataset yang digunakan adalah data sekunder publik \textit{E-Commerce Customer Churn} yang tersimpan pada \code{data/raw/data\_ecommerce\_customer\_churn.csv}. Hasil pemeriksaan awal terhadap berkas dataset aktual menunjukkan karakteristik berikut:
+Dataset yang digunakan adalah data sekunder publik \textit{E-Commerce Customer Churn} yang tersimpan pada \code{data/raw/\allowbreak data\_\allowbreak ecommerce\_\allowbreak customer\_\allowbreak churn.csv}. Hasil pemeriksaan awal terhadap berkas dataset aktual menunjukkan karakteristik berikut:
 \begin{itemize}[leftmargin=0.8cm, itemsep=2pt]
   \item \textbf{Dimensi Data Mentah:} 3.941 baris observasi pelanggan $\times$ 11 kolom (10 fitur prediktor: 8 numerik \& 2 kategorikal, ditambah 1 target \code{Churn}).
   \item \textbf{Distribusi Target Mentah:} Kelas 0 (\textit{Non-Churn}) sebanyak 3.267 baris (82,90\%) dan kelas 1 (\textit{Churn}) sebanyak 674 baris (17,10\%), dengan rasio imbalansi $\approx$ 4,85 : 1.
@@ -525,8 +537,9 @@ Dataset yang digunakan adalah data sekunder publik \textit{E-Commerce Customer C
   \caption{Kamus Data Aktual Dataset \code{data\_ecommerce\_customer\_churn.csv} (11 Atribut)}
   \label{tab:kamus_data}
   \renewcommand{\arraystretch}{1.24}
+  \setlength{\tabcolsep}{3pt}
   \scriptsize
-  \begin{tabularx}{\textwidth}{@{}c p{2.7cm} c c c p{2.8cm} L@{}}
+  \begin{tabularx}{\textwidth}{@{}M{0.5cm} P{3.3cm} M{1.0cm} M{1.3cm} M{1.5cm} P{2.3cm} L@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{No} & \thdr{Nama Kolom} & \thdr{Tipe} & \thdr{Peran} & \thdr{Missing (Raw)} & \thdr{Rentang / Nilai Unik Aktual} & \thdr{Deskripsi} \\
@@ -580,16 +593,17 @@ Ketiga algoritma dibungkus dalam objek \code{Pipeline} (\code{preprocessor + cla
   \caption{Konfigurasi Dasar dan Ruang \textit{Hyperparameter Tuning} Tiga Algoritma}
   \label{tab:tuning}
   \renewcommand{\arraystretch}{1.28}
+  \setlength{\tabcolsep}{3.5pt}
   \scriptsize
-  \begin{tabularx}{\textwidth}{@{}p{2.2cm} c c p{2.7cm} L@{}}
+  \begin{tabularx}{\textwidth}{@{}P{1.9cm} M{1.6cm} M{2.4cm} P{3.2cm} L@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Algoritma} & \thdr{Paradigma} & \thdr{Penanganan Imbalance} & \thdr{Pengaturan Dasar} & \thdr{Ruang Pencarian \textit{Hyperparameter}} \\
     \midrule
-    \textbf{Logistic Regression} & Linear Baseline & \code{class\_weight='balanced'} & \code{max\_iter=1000}, \code{random\_state=42}, StandardScaler aktif & \code{C}: [0.01, 0.1, 1.0, 10.0]; \code{solver}: ['lbfgs'] \\
+    \textbf{Logistic Regression} & Linear Baseline & \code{class\_weight=}\newline\code{'balanced'} & \code{max\_iter=1000}\newline\code{random\_state=42}\newline StandardScaler aktif & \code{C}: [0.01, 0.1, 1.0, 10.0]\newline\code{solver}: ['lbfgs'] \\
     \rowcolor{LightRow}
-    \textbf{Random Forest} & Ensemble Bagging & \code{class\_weight='balanced'} & \code{random\_state=42}, \code{n\_jobs=-1}, tanpa \textit{scaling} & \code{n\_estimators}: [100, 200, 300]; \code{max\_depth}: [None, 10, 20, 30]; \code{min\_samples\_split}: [2, 5, 10]; \code{min\_samples\_leaf}: [1, 2, 4] \\
-    \textbf{XGBoost} & Ensemble Boosting & \code{scale\_pos\_weight} ($\approx 5{,}13$ dari \code{y\_train}) & \code{eval\_metric='logloss'}, \code{random\_state=42}, \code{n\_jobs=-1}, tanpa \textit{scaling} & \code{n\_estimators}: [100, 200, 300]; \code{max\_depth}: [3, 5, 7, 9]; \code{learning\_rate}: [0.01, 0.05, 0.1, 0.2]; \code{subsample} \& \code{colsample\_bytree}: [0.8, 1.0] \\
+    \textbf{Random Forest} & Ensemble Bagging & \code{class\_weight=}\newline\code{'balanced'} & \code{random\_state=42}\newline\code{n\_jobs=-1}\newline tanpa \textit{scaling} & \code{n\_estimators}: [100, 200, 300]\newline\code{max\_depth}: [None, 10, 20, 30]\newline\code{min\_samples\_split}: [2, 5, 10]\newline\code{min\_samples\_leaf}: [1, 2, 4] \\
+    \textbf{XGBoost} & Ensemble Boosting & \code{scale\_pos\_weight}\newline($\approx 5{,}13$ dari \code{y\_train}) & \code{eval\_metric='logloss'}\newline\code{random\_state=42}\newline\code{n\_jobs=-1}\newline tanpa \textit{scaling} & \code{n\_estimators}: [100, 200, 300]\newline\code{max\_depth}: [3, 5, 7, 9]\newline\code{learning\_rate}: [0.01, 0.05, 0.1, 0.2]\newline\code{subsample}: [0.8, 1.0]\newline\code{colsample\_bytree}: [0.8, 1.0] \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -613,16 +627,17 @@ Pemetaan probabilitas prediksi $p = P(y = 1 \mid \mathbf{x})$ menuju rekomendasi
   \caption{Aturan \textit{3-Tier Risk Stratification} dan Rekomendasi Aksi Retensi Otomatis}
   \label{tab:risk_tier}
   \renewcommand{\arraystretch}{1.28}
+  \setlength{\tabcolsep}{4pt}
   \footnotesize
-  \begin{tabularx}{\textwidth}{@{}c c c L L@{}}
+  \begin{tabularx}{\textwidth}{@{}M{1.7cm} M{2.1cm} M{1.7cm} L L@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Tingkat Risiko} & \thdr{Ambang ($p$)} & \thdr{Warna UI} & \thdr{Indikasi Perilaku Utama} & \thdr{Rekomendasi Aksi Retensi Otomatis (Tim CRM)} \\
     \midrule
-    \textbf{High Risk} & $p \ge 0{,}65$ & \textbf{Merah} (\code{\#DC2626}) & Risiko \textit{churn} sangat tinggi (ada riwayat komplain, masa langganan baru, skor kepuasan rendah). & \textbf{Prioritas \textit{Service Recovery}:} Hubungi pelanggan proaktif via CS/CRM dalam 24 jam, selesaikan keluhan, \& berikan voucher retensi personal. \\
+    \textbf{High Risk} & $p \ge 0{,}65$ & \textbf{Merah}\newline(\code{\#DC2626}) & Risiko \textit{churn} sangat tinggi (ada riwayat komplain, masa langganan baru, skor kepuasan rendah). & \textbf{Prioritas \textit{Service Recovery}:} Hubungi pelanggan proaktif via CS/CRM dalam 24 jam, selesaikan keluhan, \& berikan voucher retensi personal. \\
     \rowcolor{LightRow}
-    \textbf{Medium Risk} & $0{,}35 \le p < 0{,}65$ & \textbf{Oranye} (\code{\#D97706}) & Keterlibatan (\textit{engagement}) mulai menurun atau jeda dari transaksi terakhir semakin panjang. & \textbf{Kampanye \textit{Re-Engagement}:} Kirim notifikasi personalisasi sesuai kategori favorit, promo \textit{cashback} terarah, atau pengingat kupon aktif. \\
-    \textbf{Low Risk} & $p < 0{,}35$ & \textbf{Hijau} (\code{\#16A34A}) & Pelanggan loyal, transaksi rutin terjaga, dan tingkat kepuasan baik. & \textbf{\textit{Loyalty Reinforcement}:} Pertahankan loyalitas lewat program poin / VIP \textit{tier} dan \textit{early access} produk baru tanpa diskon agresif. \\
+    \textbf{Medium Risk} & $0{,}35 \le p < 0{,}65$ & \textbf{Oranye}\newline(\code{\#D97706}) & Keterlibatan (\textit{engagement}) mulai menurun atau jeda dari transaksi terakhir semakin panjang. & \textbf{Kampanye \textit{Re-Engagement}:} Kirim notifikasi personalisasi sesuai kategori favorit, promo \textit{cashback} terarah, atau pengingat kupon aktif. \\
+    \textbf{Low Risk} & $p < 0{,}35$ & \textbf{Hijau}\newline(\code{\#16A34A}) & Pelanggan loyal, transaksi rutin terjaga, dan tingkat kepuasan baik. & \textbf{\textit{Loyalty Reinforcement}:} Pertahankan loyalitas lewat program poin / VIP \textit{tier} dan \textit{early access} produk baru tanpa diskon agresif. \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -643,8 +658,9 @@ Pada dataset bersih (\textbf{3.269 baris}), kelas \textbf{Non-Churn (0)} berjuml
   \caption{Ringkasan Pembersihan Data, Distribusi Kelas Target, dan Partisi \textit{Train-Test Split}}
   \label{tab:partisi}
   \renewcommand{\arraystretch}{1.28}
-  \footnotesize
-  \begin{tabularx}{\textwidth}{@{}p{3.0cm} c c c c L@{}}
+  \setlength{\tabcolsep}{3.5pt}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{@{}P{2.4cm} M{1.1cm} M{2.0cm} M{1.9cm} M{1.3cm} L@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Tahap / Partisi Data} & \thdr{Total Baris} & \thdr{Non-Churn (0)} & \thdr{Churn (1)} & \thdr{Rasio (0:1)} & \thdr{Keterangan Teknis} \\
@@ -666,8 +682,9 @@ Adapun nilai kosong (\textit{missing values}) pada dataset bersih tercatat pada 
   \caption{Statistik Deskriptif dan Deteksi \textit{Outlier} Metode IQR pada Dataset Bersih ($n = 3.269$)}
   \label{tab:iqr}
   \renewcommand{\arraystretch}{1.28}
-  \footnotesize
-  \begin{tabularx}{\textwidth}{@{}p{3.1cm} C C C C C@{}}
+  \setlength{\tabcolsep}{3.5pt}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{@{}P{3.6cm} C C C C C@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Fitur Numerik} & \thdr{Mean / Median} & \thdr{$Q_1$; $Q_3$} & \thdr{Batas IQR [LB; UB]} & \thdr{Rentang [Min--Max]} & \thdr{Jumlah Outlier (\%)} \\
@@ -694,8 +711,9 @@ Selanjutnya, analisis tingkat \textit{churn} per kategori pada fitur \code{Prefe
   \caption{Distribusi Tingkat Churn (\textit{Churn Rate}) Berdasarkan Fitur Kategorikal ($n = 3.269$)}
   \label{tab:churn_cat}
   \renewcommand{\arraystretch}{1.28}
+  \setlength{\tabcolsep}{4pt}
   \footnotesize
-  \begin{tabularx}{\textwidth}{@{}p{2.8cm} L C C C C@{}}
+  \begin{tabularx}{\textwidth}{@{}P{2.8cm} P{2.7cm} C C C C@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Atribut} & \thdr{Kategori} & \thdr{Total Pelanggan} & \thdr{Non-Churn (0)} & \thdr{Churn (1)} & \thdr{Churn Rate (\%)} \\
@@ -734,13 +752,14 @@ Pelatihan dan optimasi ketiga algoritma (\textbf{Logistic Regression}, \textbf{R
   \caption{Hasil \textit{Hyperparameter Tuning} dan Perbandingan Kinerja Tiga Model pada \textit{Test Set} ($n = 654$)}
   \label{tab:evaluasi}
   \renewcommand{\arraystretch}{1.28}
+  \setlength{\tabcolsep}{4pt}
   \footnotesize
-  \begin{tabularx}{\textwidth}{@{}p{3.6cm} C C C@{}}
+  \begin{tabularx}{\textwidth}{@{}P{3.3cm} C C C@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Metrik / Parameter} & \thdr{Logistic Regression (\textit{Linear Baseline})} & \thdr{Random Forest (\textit{Ensemble Bagging})} & \thdr{XGBoost (\textit{Boosting} --- Terbaik)} \\
     \midrule
-    \textbf{Hyperparameter Terbaik} & \code{C=10,0}; \code{solver='lbfgs'} & \code{n\_estimators=300}; \code{max\_depth=30}; \code{min\_samples\_split=2}; \code{min\_samples\_leaf=1} & \code{n\_estimators=300}; \code{max\_depth=7}; \code{learning\_rate=0,05}; \code{subsample=0,8}; \code{colsample\_bytree=1,0} \\
+    \textbf{Hyperparameter Terbaik} & {\scriptsize\code{C=10,0}\newline\code{solver='lbfgs'}} & {\scriptsize\code{n\_estimators=300}\newline\code{max\_depth=30}\newline\code{min\_samples\_split=2}\newline\code{min\_samples\_leaf=1}} & {\scriptsize\code{n\_estimators=300}\newline\code{max\_depth=7}\newline\code{learning\_rate=0,05}\newline\code{subsample=0,8}\newline\code{colsample\_bytree=1,0}} \\
     \rowcolor{LightRow}
     \textbf{Mean CV F1-Score (5-Fold)} & 54,66\% & 73,96\% & 73,63\% \\
     \textbf{Confusion Matrix (TN/FP/FN/TP)} & 419 / 128 / 10 / 97 & 512 / 35 / 16 / 91 & \textbf{517 / 30 / 15 / 92} \\
@@ -788,8 +807,9 @@ Untuk membuka interpretabilitas model terbaik (\code{XGBClassifier}), modul \cod
   \caption{Perbandingan Peringkat Fitur Global SHAP vs XGBoost Gain Importance (\textit{Dual Validation})}
   \label{tab:dual_val}
   \renewcommand{\arraystretch}{1.22}
+  \setlength{\tabcolsep}{4pt}
   \footnotesize
-  \begin{tabularx}{\textwidth}{@{}c L c c c@{}}
+  \begin{tabularx}{\textwidth}{@{}M{1.4cm} P{5.8cm} C M{1.4cm} C@{}}
     \toprule
     \rowcolor{HeaderBlue}
     \thdr{Rank SHAP} & \thdr{Nama Fitur Tertransformasi} & \thdr{Mean $|\mathrm{SHAP}|$ (Log-Odds)} & \thdr{Rank Gain} & \thdr{XGBoost Gain} \\
