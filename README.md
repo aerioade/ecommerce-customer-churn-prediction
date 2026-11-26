@@ -121,6 +121,49 @@ probabilitas kelas churn per baris. Kolom `Predicted_Churn` menggunakan ambang
 streamlit run app/streamlit_app.py
 ```
 
+### 4. Menjalankan Dashboard ChurnGuard (Next.js + FastAPI)
+
+Dashboard antarmuka berada di `app/` dan `components/`. Antarmuka ini menggunakan
+pipeline model, risk stratification, SHAP, serta artefak EDA yang sudah ada di
+repository melalui API lokal FastAPI di `backend/main.py`.
+
+Siapkan virtual environment dan dependency Python sekali saja:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Jalankan API Python pada terminal pertama:
+
+```bash
+python -m uvicorn backend.main:app --reload --port 8000
+```
+
+Jalankan frontend pada terminal kedua:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Buka `http://localhost:3000`. Untuk production build, gunakan `pnpm exec next build --webpack`.
+Jika API dijalankan pada alamat lain, atur `NEXT_PUBLIC_API_BASE_URL` sebelum menjalankan frontend.
+
+Empat halaman dashboard membaca sumber asli repository:
+
+* **Overview:** data pelanggan bersih diprediksi oleh `best_model_pipeline.joblib`.
+* **Individual Prediction:** prediksi probabilitas, tier risiko, rekomendasi, dan SHAP lokal.
+* **Batch Prediction:** unggah CSV/XLSX berisi 10 fitur prediktor dan unduh hasil CSV.
+* **Model Analytics & EDA:** data dari `artifacts/evaluation_metrics.json`,
+  `artifacts/feature_importance.json`, dan `artifacts/eda_summary.json`.
+
+Contoh file input batch untuk mencoba halaman Batch Prediction tersedia di
+`data/samples/churnguard_sample_customers.csv`. File ini hanya untuk inference
+dan demonstrasi; tidak digunakan untuk melatih ulang model atau mengubah dataset
+utama proyek.
+
 ---
 
 ## Referensi Ilmiah Acuan (Scopus 2026)
