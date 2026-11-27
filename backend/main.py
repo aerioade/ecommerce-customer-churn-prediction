@@ -77,11 +77,26 @@ def _local_explanation(frame: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+OPTIONAL_ID_COLUMNS = {"customerid", "customer_id"}
+
+
+def _find_optional_id_column(frame: pd.DataFrame) -> str | None:
+    """Return the original column name if an optional CustomerID column is present."""
+    for column in frame.columns:
+        if str(column).strip().lower() in OPTIONAL_ID_COLUMNS:
+            return str(column)
+    return None
+
+
 def _validate_inference_frame(frame: pd.DataFrame) -> list[str]:
     """Validate batch inference inputs without changing the training pipeline."""
     validate_schema(frame, require_target=False)
     warnings: list[str] = []
-    ignored = [column for column in frame.columns if column not in FEATURE_COLUMNS]
+    id_column = _find_optional_id_column(frame)
+    ignored = [
+        column for column in frame.columns
+        if column not in FEATURE_COLUMNS and column != id_column
+    ]
     if ignored:
         warnings.append(f"Kolom tambahan diabaikan: {', '.join(ignored)}.")
 
@@ -190,10 +205,14 @@ def _read_upload(upload: UploadFile, content: bytes) -> pd.DataFrame:
 async def predict_batch(file: UploadFile = File(...)) -> dict[str, Any]:
     try:
         frame = _read_upload(file, await file.read())
-        warnings = _validate_inference_frame(standardize_categories(frame))
-        customers = standardize_categories(frame)[FEATURE_COLUMNS].copy()
+        standardized = standardize_categories(frame)
+        warnings = _validate_inference_frame(standardized)
+        id_column = _find_optional_id_column(standardized)
+        customers = standardized[FEATURE_COLUMNS].copy()
         probabilities = _positive_probabilities(customers)
         results = apply_risk_to_batch(customers, probabilities)
+        if id_column is not None:
+            results.insert(0, "CustomerID", standardized[id_column].values)
         counts = results["Risk_Tier"].value_counts().to_dict()
         return {
             "summary": {
